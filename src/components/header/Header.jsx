@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { FaShoppingCart, FaTimes } from 'react-icons/fa';
-import { HiOutlineMenuAlt3 } from 'react-icons/hi';
-import styles from './Header.module.scss';
+import React, { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { FaShoppingCart, FaTimes } from "react-icons/fa";
+import { HiOutlineMenuAlt3 } from "react-icons/hi";
+import { ToastContainer, toast } from "react-toastify";
+import styles from "./Header.module.scss";
+import "react-toastify/dist/ReactToastify.css";
+import { auth } from "../../firebase/config";
 
 const logo = (
   <div className={styles.logo}>
@@ -23,10 +27,20 @@ const cart = (
   </span>
 );
 
-const activeLink = ({ isActive }) => (isActive ? `${styles.active}` : '');
+const activeLink = ({ isActive }) => (isActive ? `${styles.active}` : "");
 
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
+
+  const logout = () => {
+    signOut(auth)
+      .then(() => {
+        toast.success("Logout is successfuly..");
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  };
 
   const toggleMenu = () => {
     setShowMenu((prev) => !prev);
@@ -38,24 +52,25 @@ const Header = () => {
 
   return (
     <header>
+      <ToastContainer />
       <div className={styles.header}>
         {logo}
 
         <nav
           className={
-            showMenu ? `${styles['show-nav']}` : `${styles['hide-nav']}`
+            showMenu ? `${styles["show-nav"]}` : `${styles["hide-nav"]}`
           }
         >
           <div
             className={
               showMenu
-                ? `${styles['nav-wrapper']} ${styles['show-nav-wrapper']}`
-                : `${styles['nav-wrapper']}`
+                ? `${styles["nav-wrapper"]} ${styles["show-nav-wrapper"]}`
+                : `${styles["nav-wrapper"]}`
             }
             onClick={toggleMenu}
           ></div>
           <ul>
-            <li className={styles['logo-mobile']}>
+            <li className={styles["logo-mobile"]}>
               {logo}
               <FaTimes size={22} onClick={hideMenu} />
             </li>
@@ -78,6 +93,9 @@ const Header = () => {
               <NavLink to='/register' className={activeLink}>
                 register
               </NavLink>
+              <NavLink to='/' onClick={logout}>
+                Logout
+              </NavLink>
               <NavLink to='/order-history' className={activeLink}>
                 My Orders
               </NavLink>
@@ -86,7 +104,7 @@ const Header = () => {
           </div>
         </nav>
 
-        <div className={styles['menu-icon']}>
+        <div className={styles["menu-icon"]}>
           {cart}
           <HiOutlineMenuAlt3 size={28} onClick={toggleMenu} />
         </div>
